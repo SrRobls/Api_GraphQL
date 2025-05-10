@@ -22,6 +22,9 @@ class UserApp_TB(models.Model):
 class TypeDocument_TB(models.Model):
     name_type_document = models.CharField(max_length=50, unique=True)
 
+    def __str__(self):
+        return f"{self.name_type_document}"
+
 class UserDocument_TB(models.Model):
     user_id = models.OneToOneField(UserApp_TB, on_delete=models.CASCADE)
     document = models.CharField(max_length=20, unique=True)
@@ -30,7 +33,7 @@ class UserDocument_TB(models.Model):
     date_expedition = models.DateField()
     
     def __str__(self):
-        return f"{self.type_document}: {self.document} - {self.user_id.name} {self.user_id.last_name}"
+        return f"{self.type_document.name_type_document}: {self.document} - {self.user_id.name} {self.user_id.last_name}"
     
 
 
@@ -41,7 +44,7 @@ class Country_TB(models.Model):
     def __str__(self):
         return self.country_name
     
-class ContactInfo(models.Model):
+class ContactInfo_TB(models.Model):
     user_id = models.OneToOneField(UserApp_TB, on_delete=models.CASCADE, related_name='contact')
     address = models.CharField(max_length=60)
     country_id = models.ForeignKey(Country_TB, on_delete=models.PROTECT)
@@ -52,5 +55,5 @@ class ContactInfo(models.Model):
     emergency_phone = models.CharField(max_length=20)
 
     def __str__(self):
-        return f"{self.phone} - {self.address}"
+        return f"{self.user_id.name} {self.user_id.last_name}: {self.phone} - {self.address}"
 
