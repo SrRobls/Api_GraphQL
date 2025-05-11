@@ -1,0 +1,630 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Registration & Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <style>
+        .readonly-input { background-color: #e9ecef; pointer-events: none; }
+        .pointer { cursor: pointer; }
+        .password-toggle { cursor: pointer; }
+        .column-filters-container {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 0.12rem;
+            width: 100%;
+            overflow-x: auto;
+            align-items: start;
+        }
+        .form-check {
+            display: flex;
+            align-items: center;
+            gap: 0.15em;
+            min-width: 80px;
+            white-space: nowrap;
+            margin: 0;
+            padding: 0.12rem 0;
+        }
+        @media (max-width: 900px) {
+            .column-filters-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .form-check { min-width: 70px; }
+        }
+    </style>
+</head>
+<body class="bg-light">
+<div class="container py-5">
+    <h2 class="mb-4 text-center">User Registration & Management</h2>
+    <div id="alert-container"></div>
+    <!-- User Form -->
+    <form id="userForm" class="card p-4 mb-5 shadow">
+        <input type="hidden" id="userId" name="userId">
+        <h5 class="mb-3">Basic Information</h5>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label for="username" class="form-label">Username *</label>
+                <input type="text" class="form-control" id="username" name="username" required maxlength="50">
+            </div>
+            <div class="col-md-4">
+                <label for="password" class="form-label">Password *</label>
+                <div class="input-group">
+                    <input type="password" class="form-control" id="password" name="password" required maxlength="128">
+                    <button class="btn btn-outline-secondary password-toggle" type="button" onclick="togglePasswordVisibility()">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <label for="email" class="form-label">Email *</label>
+                <input type="email" class="form-control" id="email" name="email" required maxlength="100">
+            </div>
+            <div class="col-md-4">
+                <label for="name" class="form-label">First Name *</label>
+                <input type="text" class="form-control" id="name" name="name" required maxlength="20">
+            </div>
+            <div class="col-md-4">
+                <label for="lastName" class="form-label">Last Name *</label>
+                <input type="text" class="form-control" id="lastName" name="lastName" required maxlength="20">
+            </div>
+            <div class="col-md-2">
+                <label for="isMilitar" class="form-label">Military *</label>
+                <select class="form-select" id="isMilitar" name="isMilitar" required>
+                    <option value="true" selected>Yes</option>
+                    <option value="false">No</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label for="isTemporal" class="form-label">Temporal *</label>
+                <select class="form-select" id="isTemporal" name="isTemporal" required>
+                    <option value="true" selected>Yes</option>
+                    <option value="false">No</option>
+                </select>
+            </div>
+        </div>
+        <hr class="my-4">
+        <h5 class="mb-3">Identity Document</h5>
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label for="document" class="form-label">Document Number *</label>
+                <input type="number" class="form-control" id="document" name="document" required maxlength="20" min="0" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+            </div>
+            <div class="col-md-3">
+                <label for="typeDocumentName" class="form-label">Document Type *</label>
+                <select class="form-select" id="typeDocumentName" name="typeDocumentName" required></select>
+            </div>
+            <div class="col-md-3">
+                <label for="placeExpedition" class="form-label">Place of Expedition *</label>
+                <input type="text" class="form-control" id="placeExpedition" name="placeExpedition" required maxlength="60">
+            </div>
+            <div class="col-md-3">
+                <label for="dateExpedition" class="form-label">Date of Expedition *</label>
+                <input type="date" class="form-control" id="dateExpedition" name="dateExpedition" required>
+            </div>
+        </div>
+        <hr class="my-4">
+        <h5 class="mb-3">Contact Information</h5>
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label for="phone" class="form-label">Phone *</label>
+                <input type="number" class="form-control" id="phone" name="phone" required maxlength="20" min="0" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+            </div>
+            <div class="col-md-3">
+                <label for="celPhone" class="form-label">Cell Phone *</label>
+                <input type="number" class="form-control" id="celPhone" name="celPhone" required maxlength="20" min="0" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+            </div>
+            <div class="col-md-3">
+                <label for="address" class="form-label">Address *</label>
+                <input type="text" class="form-control" id="address" name="address" required maxlength="60">
+            </div>
+            <div class="col-md-3">
+                <label for="city" class="form-label">City *</label>
+                <input type="text" class="form-control" id="city" name="city" required maxlength="50">
+            </div>
+            <div class="col-md-3">
+                <label for="countryName" class="form-label">Country *</label>
+                <select class="form-select" id="countryName" name="countryName" required></select>
+            </div>
+            <div class="col-md-3">
+                <label for="countryCode" class="form-label">Country Code</label>
+                <input type="text" class="form-control readonly-input" id="countryCode" name="countryCode" readonly>
+            </div>
+            <div class="col-md-3">
+                <label for="emergencyName" class="form-label">Emergency Name *</label>
+                <input type="text" class="form-control" id="emergencyName" name="emergencyName" required maxlength="100">
+            </div>
+            <div class="col-md-3">
+                <label for="emergencyPhone" class="form-label">Emergency Phone *</label>
+                <input type="number" class="form-control" id="emergencyPhone" name="emergencyPhone" required maxlength="20" min="0" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+            </div>
+        </div>
+        <div class="d-flex justify-content-end mt-4 gap-2">
+            <button type="submit" class="btn btn-primary" id="submitBtn">Create User</button>
+            <button type="button" class="btn btn-secondary d-none" id="clearBtn">Clear</button>
+        </div>
+    </form>
+
+    <!-- User Table -->
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">User List</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0" id="usersTable">
+                    <thead class="table-light">
+                        <tr id="tableHeaderRow">
+                            <!-- Dynamic columns -->
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        <!-- Users loaded dynamically -->
+                    </tbody>
+                </table>
+            </div>
+            <nav class="mt-3">
+                <ul class="pagination justify-content-center" id="pagination">
+                    <!-- Pagination buttons -->
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for User View -->
+<div class="modal fade" id="userViewModal" tabindex="-1" aria-labelledby="userViewModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="userViewModalLabel">User Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="userViewModalBody">
+        <!-- User info will be injected here -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// --- GraphQL Queries & Mutations ---
+const TYPE_DOCUMENTS_QUERY = `query { allTypeDocuments { nameTypeDocument } }`;
+const COUNTRIES_QUERY = `query { allCountries { countryName countryCode } }`;
+const USERS_QUERY = `query { allUsers { userId username email name lastName isMilitar isTemporal timeCreated userdocumentTb { document typeDocument { nameTypeDocument } placeExpedition dateExpedition } contact { phone celPhone address city countryId { countryName countryCode } emergencyName emergencyPhone } } }`;
+const USER_BY_ID_QUERY = id => `query { userById(id: ${id}) { userId username password email name lastName isMilitar isTemporal timeCreated userdocumentTb { document typeDocument { nameTypeDocument } placeExpedition dateExpedition } contact { phone celPhone address city countryId { countryName countryCode } emergencyName emergencyPhone } } }`;
+const CREATE_USER_MUTATION = `mutation CreateUser($input: UserAppInput!) { createUser(input: $input) { success message user { userId } } }`;
+const UPDATE_USER_MUTATION = `mutation UpdateUser($id: ID!, $user: UpdateUserFields, $document: UpdateDocumentFields, $contact: UpdateContactFields) { updateUser(id: $id, user: $user, document: $document, contact: $contact) { success message user { userId } } }`;
+const DELETE_USER_MUTATION = `mutation DeleteUser($id: ID!) { deleteUser(id: $id) { success message } }`;
+
+// --- UI State ---
+let users = [];
+let filteredUsers = [];
+let currentPage = 1;
+const pageSize = 10;
+let visibleColumns = [
+    'userId', 'username', 'email', 'name', 'lastName', 'isMilitar', 'isTemporal',
+    'document', 'typeDocument', 'placeExpedition', 'dateExpedition',
+    'phone', 'celPhone', 'address', 'city', 'countryName', 'countryCode',
+    'emergencyName', 'emergencyPhone', 'timeCreated', 'actions'
+];
+const allColumns = [
+    { key: 'userId', label: 'ID' },
+    { key: 'username', label: 'Username' },
+    { key: 'email', label: 'Email' },
+    { key: 'name', label: 'First Name' },
+    { key: 'lastName', label: 'Last Name' },
+    { key: 'isMilitar', label: 'Military' },
+    { key: 'isTemporal', label: 'Temporal' },
+    { key: 'document', label: 'Document' },
+    { key: 'typeDocument', label: 'Doc Type' },
+    { key: 'placeExpedition', label: 'Place Exp.' },
+    { key: 'dateExpedition', label: 'Date Exp.' },
+    { key: 'phone', label: 'Phone' },
+    { key: 'celPhone', label: 'Cell Phone' },
+    { key: 'address', label: 'Address' },
+    { key: 'city', label: 'City' },
+    { key: 'countryName', label: 'Country' },
+    { key: 'countryCode', label: 'Country Code' },
+    { key: 'emergencyName', label: 'Emergency Name' },
+    { key: 'emergencyPhone', label: 'Emergency Phone' },
+    { key: 'timeCreated', label: 'Created At' },
+    { key: 'actions', label: 'Actions' }
+];
+
+// --- Utility Functions ---
+function showAlert(message, type = 'success') {
+    const alertContainer = document.getElementById('alert-container');
+    const alertHtml = `<div class="alert alert-${type} alert-dismissible fade show" role="alert">
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>`;
+    alertContainer.innerHTML = alertHtml;
+    if (type !== 'danger') {
+        setTimeout(() => { alertContainer.innerHTML = ''; }, 5000);
+    }
+}
+
+async function graphqlRequest(query, variables = null) {
+    const response = await fetch('/graphql/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(variables ? { query, variables } : { query })
+    });
+    const json = await response.json();
+    return json;
+}
+
+// --- Dynamic Selects ---
+async function loadTypeDocuments() {
+    const data = await graphqlRequest(TYPE_DOCUMENTS_QUERY);
+    const select = document.getElementById('typeDocumentName');
+    select.innerHTML = '<option value="" disabled selected>Select...</option>';
+    (data.data.allTypeDocuments || []).forEach(doc => {
+        select.innerHTML += `<option value="${doc.nameTypeDocument}">${doc.nameTypeDocument}</option>`;
+    });
+}
+
+async function loadCountries() {
+    const data = await graphqlRequest(COUNTRIES_QUERY);
+    const select = document.getElementById('countryName');
+    select.innerHTML = '<option value="" disabled selected>Select...</option>';
+    (data.data.allCountries || []).forEach(country => {
+        select.innerHTML += `<option value="${country.countryName}" data-code="${country.countryCode}">${country.countryName}</option>`;
+    });
+    select.addEventListener('change', function() {
+        const code = select.options[select.selectedIndex].getAttribute('data-code') || '';
+        document.getElementById('countryCode').value = code;
+    });
+}
+
+// --- User Table & Pagination ---
+function renderTableHeader() {
+    const headerRow = document.getElementById('tableHeaderRow');
+    headerRow.innerHTML = '';
+    allColumns.forEach(col => {
+        if (col.key !== 'actions' && col.key !== 'password') headerRow.innerHTML += `<th>${col.label}</th>`;
+        if (col.key === 'actions') headerRow.innerHTML += `<th>${col.label}</th>`;
+    });
+}
+
+function renderTableBody() {
+    const tbody = document.getElementById('usersTableBody');
+    tbody.innerHTML = '';
+    const pageUsers = filteredUsers.slice().reverse().slice((currentPage-1)*pageSize, currentPage*pageSize);
+    pageUsers.forEach(user => {
+        tbody.innerHTML += renderUserRowAllColumns(user);
+    });
+}
+
+function renderUserRowAllColumns(user) {
+    const doc = user.userdocumentTb || {};
+    const contact = user.contact || {};
+    const country = contact.countryId || {};
+    const row = [];
+    allColumns.forEach(col => {
+        if (col.key === 'password') return;
+        switch(col.key) {
+            case 'userId': row.push(`<td><a href="#" onclick="viewUser(${user.userId}); return false;">${user.userId}</a></td>`); break;
+            case 'username': row.push(`<td>${user.username}</td>`); break;
+            case 'email': row.push(`<td><a href="#" onclick="viewUserByEmail('${user.email}'); return false;">${user.email}</a></td>`); break;
+            case 'name': row.push(`<td>${user.name}</td>`); break;
+            case 'lastName': row.push(`<td>${user.lastName || ''}</td>`); break;
+            case 'isMilitar': row.push(`<td>${user.isMilitar ? 'Yes' : 'No'}</td>`); break;
+            case 'isTemporal': row.push(`<td>${user.isTemporal ? 'Yes' : 'No'}</td>`); break;
+            case 'document': row.push(`<td>${doc.document || ''}</td>`); break;
+            case 'typeDocument': row.push(`<td>${doc.typeDocument?.nameTypeDocument || ''}</td>`); break;
+            case 'placeExpedition': row.push(`<td>${doc.placeExpedition || ''}</td>`); break;
+            case 'dateExpedition': row.push(`<td>${doc.dateExpedition || ''}</td>`); break;
+            case 'phone': row.push(`<td>${contact.phone || ''}</td>`); break;
+            case 'celPhone': row.push(`<td>${contact.celPhone || ''}</td>`); break;
+            case 'address': row.push(`<td>${contact.address || ''}</td>`); break;
+            case 'city': row.push(`<td>${contact.city || ''}</td>`); break;
+            case 'countryName': row.push(`<td>${country.countryName || ''}</td>`); break;
+            case 'countryCode': row.push(`<td>${country.countryCode || ''}</td>`); break;
+            case 'emergencyName': row.push(`<td>${contact.emergencyName || ''}</td>`); break;
+            case 'emergencyPhone': row.push(`<td>${contact.emergencyPhone || ''}</td>`); break;
+            case 'timeCreated':
+                let date = user.timeCreated ? user.timeCreated.split('T')[0] : '';
+                row.push(`<td>${date}</td>`);
+                break;
+            case 'actions':
+                row.push(`<td>
+                    <button class="btn btn-sm btn-info me-1" onclick="showUserModal(${user.userId})">View</button>
+                    <button class="btn btn-sm btn-warning me-1" onclick="editUser(${user.userId})">Edit</button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteUser(${user.userId})">Delete</button>
+                </td>`);
+                break;
+        }
+    });
+    return `<tr>${row.join('')}</tr>`;
+}
+
+function renderPagination() {
+    const totalPages = Math.ceil(filteredUsers.length / pageSize) || 1;
+    const pagination = document.getElementById('pagination');
+    pagination.innerHTML = '';
+    for (let i = 1; i <= totalPages; i++) {
+        pagination.innerHTML += `<li class="page-item${i === currentPage ? ' active' : ''}"><a class="page-link pointer" onclick="goToPage(${i})">${i}</a></li>`;
+    }
+}
+function goToPage(page) {
+    currentPage = page;
+    renderTableBody();
+    renderPagination();
+}
+
+// --- Load Users ---
+async function loadUsers() {
+    try {
+        const data = await graphqlRequest(USERS_QUERY);
+        users = (data.data && data.data.allUsers) ? data.data.allUsers : [];
+        filteredUsers = users;
+        renderTableHeader();
+        renderTableBody();
+        renderPagination();
+        if (users.length === 0) {
+            showAlert('No users found.', 'info');
+        }
+    } catch (err) {
+        showAlert('Error loading users.', 'danger');
+    }
+}
+
+// --- Form Handling ---
+function resetForm() {
+    document.getElementById('userForm').reset();
+    document.getElementById('userId').value = '';
+    document.getElementById('submitBtn').textContent = 'Create User';
+    document.getElementById('clearBtn').classList.add('d-none');
+    document.getElementById('username').removeAttribute('readonly');
+    document.getElementById('email').removeAttribute('readonly');
+    document.getElementById('password').required = true;
+    document.getElementById('password').removeAttribute('readonly');
+}
+
+document.getElementById('clearBtn').addEventListener('click', resetForm);
+
+document.getElementById('userForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const isEdit = !!document.getElementById('userId').value;
+    const formData = new FormData(this);
+    const input = {
+        username: formData.get('username'),
+        password: formData.get('password'),
+        email: formData.get('email'),
+        name: formData.get('name'),
+        lastname: formData.get('lastName'),
+        isMilitar: formData.get('isMilitar') === 'true',
+        isTemporal: formData.get('isTemporal') === 'true',
+        document: {
+            document: formData.get('document'),
+            nameTypeDocument: formData.get('typeDocumentName'),
+            placeExpedition: formData.get('placeExpedition'),
+            dateExpedition: formData.get('dateExpedition'),
+        },
+        contact: {
+            phone: formData.get('phone'),
+            celPhone: formData.get('celPhone'),
+            address: formData.get('address'),
+            city: formData.get('city'),
+            countryName: formData.get('countryName'),
+            emergencyName: formData.get('emergencyName'),
+            emergencyPhone: formData.get('emergencyPhone'),
+        }
+    };
+
+    try {
+        let result;
+        let message = '';
+        if (isEdit) {
+            const id = formData.get('userId');
+            const userFields = {
+                email: input.email,
+                name: input.name,
+                lastname: input.lastname,
+                isMilitar: input.isMilitar,
+                isTemporal: input.isTemporal
+            };
+            const documentFields = {
+                document: input.document.document,
+                typeDocumentName: input.document.nameTypeDocument,
+                placeExpedition: input.document.placeExpedition,
+                dateExpedition: input.document.dateExpedition
+            };
+            const contactFields = {
+                phone: input.contact.phone,
+                celPhone: input.contact.celPhone,
+                address: input.contact.address,
+                city: input.contact.city,
+                countryName: input.contact.countryName,
+                emergencyName: input.contact.emergencyName,
+                emergencyPhone: input.contact.emergencyPhone
+            };
+            result = await graphqlRequest(UPDATE_USER_MUTATION, {
+                id,
+                user: userFields,
+                document: documentFields,
+                contact: contactFields
+            });
+            message = result.data?.updateUser?.message || '';
+            if (result.data?.updateUser?.success) {
+                showAlert(message || 'User updated successfully.', 'success');
+                resetForm();
+                loadUsers();
+            } else {
+                let errorMsg = message || 'Error updating user.';
+                if (result.errors && result.errors.length > 0) {
+                    errorMsg += '<br>' + result.errors.map(e => e.message).join('<br>');
+                }
+                showAlert(errorMsg, 'danger');
+            }
+        } else {
+            result = await graphqlRequest(CREATE_USER_MUTATION, { input });
+            message = result.data?.createUser?.message || '';
+            if (result.data?.createUser?.success) {
+                showAlert(message || 'User created successfully.', 'success');
+                resetForm();
+                loadUsers();
+            } else {
+                let errorMsg = message || 'Error creating user.';
+                if (result.errors && result.errors.length > 0) {
+                    errorMsg += '<br>' + result.errors.map(e => e.message).join('<br>');
+                }
+                showAlert(errorMsg, 'danger');
+            }
+        }
+    } catch (err) {
+        showAlert('An unexpected error occurred. Please try again.', 'danger');
+        console.error('Error:', err);
+    }
+});
+
+// --- User Actions ---
+window.viewUser = async function(id) {
+    try {
+        const data = await graphqlRequest(USER_BY_ID_QUERY(id));
+        const user = data.data.userById;
+        if (!user) {
+            showAlert('User not found.', 'danger');
+            return;
+        }
+        // Scroll al top
+        document.getElementById('userForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // Populate form para editar
+        document.getElementById('userId').value = user.userId;
+        document.getElementById('username').value = user.username;
+        document.getElementById('username').setAttribute('readonly', 'readonly');
+        document.getElementById('password').value = user.password || '';
+        document.getElementById('password').setAttribute('readonly', 'readonly');
+        document.getElementById('password').required = false;
+        document.getElementById('email').value = user.email;
+        document.getElementById('email').setAttribute('readonly', 'readonly');
+        document.getElementById('name').value = user.name;
+        document.getElementById('lastName').value = user.lastName || '';
+        document.getElementById('isMilitar').value = user.isMilitar ? 'true' : 'false';
+        document.getElementById('isTemporal').value = user.isTemporal ? 'true' : 'false';
+        // Document
+        document.getElementById('document').value = user.userdocumentTb?.document || '';
+        document.getElementById('typeDocumentName').value = user.userdocumentTb?.typeDocument?.nameTypeDocument || '';
+        document.getElementById('placeExpedition').value = user.userdocumentTb?.placeExpedition || '';
+        document.getElementById('dateExpedition').value = user.userdocumentTb?.dateExpedition || '';
+        // Contact
+        document.getElementById('phone').value = user.contact?.phone || '';
+        document.getElementById('celPhone').value = user.contact?.celPhone || '';
+        document.getElementById('address').value = user.contact?.address || '';
+        document.getElementById('city').value = user.contact?.city || '';
+        document.getElementById('countryName').value = user.contact?.countryId?.countryName || '';
+        document.getElementById('countryCode').value = user.contact?.countryId?.countryCode || '';
+        document.getElementById('emergencyName').value = user.contact?.emergencyName || '';
+        document.getElementById('emergencyPhone').value = user.contact?.emergencyPhone || '';
+        document.getElementById('submitBtn').textContent = 'Update User';
+        document.getElementById('clearBtn').classList.remove('d-none');
+    } catch (err) {
+        showAlert('Error loading user data.', 'danger');
+        console.error('Error:', err);
+    }
+}
+window.editUser = window.viewUser;
+window.viewUserByEmail = function(email) {
+    const user = users.find(u => u.email === email);
+    if (user) window.viewUser(user.userId);
+};
+window.deleteUser = async function(id) {
+    if (!confirm('Are you sure you want to delete this user?')) return;
+    try {
+        const result = await graphqlRequest(DELETE_USER_MUTATION, { id });
+        if (result.data?.deleteUser?.success) {
+            showAlert(result.data.deleteUser.message || 'User deleted successfully.', 'success');
+            loadUsers();
+            resetForm();
+        } else {
+            const errorMessage = result.data?.deleteUser?.message || 'Error deleting user.';
+            showAlert(errorMessage, 'danger');
+        }
+    } catch (err) {
+        showAlert('An unexpected error occurred while deleting the user.', 'danger');
+        console.error('Error:', err);
+    }
+};
+
+function togglePasswordVisibility() {
+    const passwordInput = document.getElementById('password');
+    const toggleButton = document.querySelector('.password-toggle i');
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleButton.classList.remove('bi-eye');
+        toggleButton.classList.add('bi-eye-slash');
+    } else {
+        passwordInput.type = 'password';
+        toggleButton.classList.remove('bi-eye-slash');
+        toggleButton.classList.add('bi-eye');
+    }
+}
+
+window.showUserModal = async function(id) {
+    const data = await graphqlRequest(USER_BY_ID_QUERY(id));
+    const user = data.data.userById;
+    if (!user) {
+        showAlert('User not found.', 'danger');
+        return;
+    }
+    const doc = user.userdocumentTb || {};
+    const contact = user.contact || {};
+    const country = contact.countryId || {};
+    const html = `
+    <div class="row g-3">
+      <div class="col-md-4"><b>ID:</b> ${user.userId}</div>
+      <div class="col-md-4"><b>Username:</b> ${user.username}</div>
+      <div class="col-md-4"><b>Password:</b> <input type='password' class='form-control d-inline-block' value='${user.password || ''}' readonly style='width: 80%; display: inline-block;'><button class='btn btn-sm btn-outline-secondary ms-1' onclick='toggleModalPassword(this)'><i class="bi bi-eye"></i></button></div>
+      <div class="col-md-4"><b>Email:</b> ${user.email}</div>
+      <div class="col-md-4"><b>First Name:</b> ${user.name}</div>
+      <div class="col-md-4"><b>Last Name:</b> ${user.lastName || user.lastName || ''}</div>
+      <div class="col-md-4"><b>Military:</b> ${user.isMilitar ? 'Yes' : 'No'}</div>
+      <div class="col-md-4"><b>Temporal:</b> ${user.isTemporal ? 'Yes' : 'No'}</div>
+      <div class="col-md-4"><b>Document:</b> ${doc.document || ''}</div>
+      <div class="col-md-4"><b>Doc Type:</b> ${doc.typeDocument?.nameTypeDocument || ''}</div>
+      <div class="col-md-4"><b>Place Exp.:</b> ${doc.placeExpedition || ''}</div>
+      <div class="col-md-4"><b>Date Exp.:</b> ${doc.dateExpedition || ''}</div>
+      <div class="col-md-4"><b>Phone:</b> ${contact.phone || ''}</div>
+      <div class="col-md-4"><b>Cell Phone:</b> ${contact.celPhone || ''}</div>
+      <div class="col-md-4"><b>Address:</b> ${contact.address || ''}</div>
+      <div class="col-md-4"><b>City:</b> ${contact.city || ''}</div>
+      <div class="col-md-4"><b>Country:</b> ${country.countryName || ''}</div>
+      <div class="col-md-4"><b>Country Code:</b> ${country.countryCode || ''}</div>
+      <div class="col-md-4"><b>Emergency Name:</b> ${contact.emergencyName || ''}</div>
+      <div class="col-md-4"><b>Emergency Phone:</b> ${contact.emergencyPhone || ''}</div>
+    </div>`;
+    document.getElementById('userViewModalBody').innerHTML = html;
+    const modal = new bootstrap.Modal(document.getElementById('userViewModal'));
+    modal.show();
+}
+window.toggleModalPassword = function(btn) {
+    const input = btn.parentElement.querySelector('input');
+    const icon = btn.querySelector('i');
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('bi-eye');
+        icon.classList.add('bi-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.remove('bi-eye-slash');
+        icon.classList.add('bi-eye');
+    }
+}
+
+// --- Initial Load ---
+window.addEventListener('DOMContentLoaded', async () => {
+    await loadTypeDocuments();
+    await loadCountries();
+    await loadUsers();
+});
+</script>
+</body>
+</html> 

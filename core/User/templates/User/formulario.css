@@ -1,0 +1,27 @@
+/* Estilos del formulario de usuario */
+.readonly-input { background-color: #e9ecef; pointer-events: none; }
+.pointer { cursor: pointer; }
+.password-toggle { cursor: pointer; }
+.column-filters-container {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0.12rem;
+    width: 100%;
+    overflow-x: auto;
+    align-items: start;
+}
+.form-check {
+    display: flex;
+    align-items: center;
+    gap: 0.15em;
+    min-width: 80px;
+    white-space: nowrap;
+    margin: 0;
+    padding: 0.12rem 0;
+}
+@media (max-width: 900px) {
+    .column-filters-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .form-check { min-width: 70px; }
+} 

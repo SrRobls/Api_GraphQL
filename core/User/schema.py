@@ -163,6 +163,22 @@ class CreateUser(graphene.Mutation):
                 if UserDocument_TB.objects.filter(document=input.document.document).exists():
                     return CreateUser(success=False, message="Document already exists")
                 
+                # Validate that the document number contains only numeric characters
+                if not input.document.document.isdigit():
+                    return CreateUser(success=False, message="Document number must contain only numeric characters")
+                
+                # Validate that the phone number contains only numeric characters
+                if not input.contact.phone.isdigit():
+                    return CreateUser(success=False, message="Phone number must contain only numeric characters")
+                
+                # Validate that the cellphone number contains only numeric characters
+                if not input.contact.cel_phone.isdigit():
+                    return CreateUser(success=False, message="Cellphone number must contain only numeric characters")
+                
+                # Validate that the emergency phone number contains only numeric characters
+                if not input.contact.emergency_phone.isdigit():
+                    return CreateUser(success=False, message="Emergency phone number must contain only numeric characters")
+                
                 try:
                     type_doc = TypeDocument_TB.objects.get(name_type_document__iexact=input.document.name_type_document)
                 except TypeDocument_TB.DoesNotExist:
