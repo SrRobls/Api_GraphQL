@@ -136,3 +136,19 @@ import os
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+INSTALLED_APPS += [
+    'corsheaders',
+]
+
+MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+    *MIDDLEWARE,
+]
+
+CORS_ALLOW_ALL_ORIGINS = True  # Solo para pruebas. Para producción usa CORS_ALLOWED_ORIGINS
+
+CORS_ALLOWED_ORIGINS = [
+    "http://35.192.42.29:8000",
+]
+
