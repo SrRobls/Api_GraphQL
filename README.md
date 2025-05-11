@@ -3,7 +3,7 @@
 ¡Bienvenido!  
 ¿Quieres ver la demo en vivo? Visita [http://35.192.42.29:8000/](http://35.192.42.29:8000/) para el formulario de registro y [http://35.192.42.29:8000/graphql/](http://35.192.42.29:8000/graphql/) para interactuar con la API GraphQL.  
 
-Este proyecto ha sido desplegado en un **Compute Engine** de **Google Cloud Platform (GCP)**, lo que garantiza un entorno escalable y confiable para su ejecución.
+Este proyecto ha sido desplegado en un **Compute Engine** de **Google Cloud Platform (GCP)** en un contendor Docker (pueden ver el Dockerfile y el docker-compose.yml donde configuro esto), lo que garantiza un entorno escalable y confiable para su ejecución.
 
 ## Descripción
 
