@@ -1,5 +1,8 @@
 # User Registration & Management API (GraphQL)
 
+¡Bienvenido!  
+¿Quieres ver la demo en vivo? Visita [http://35.192.42.29:8000/](http://35.192.42.29:8000/) para el formulario de registro y [http://35.192.42.29:8000/graphql/](http://35.192.42.29:8000/graphql/) para interactuar con la API GraphQL.
+
 ## Descripción
 
 Este proyecto es una API REST (GraphQL) desarrollada en Django que permite el registro y la gestión de usuarios. Se utilizan Graphene-Django para implementar el esquema GraphQL, y se incluye un formulario (HTML/CSS/JS) para interactuar con la API. El proyecto está dockerizado para facilitar su despliegue y ejecución.
@@ -29,7 +32,7 @@ El proyecto se organiza de la siguiente manera:
     - **wsgi.py** y **asgi.py:** Configuración para WSGI/ASGI (despliegue).  
   - **User/:**  
     - **models.py:** Define los modelos (UserApp_TB, UserDocument_TB, TypeDocument_TB, Country_TB, ContactInfo_TB, etc.).  
-    - **schema.py:** Implementa los tipos GraphQL (DjangoObjectType) y las mutaciones (por ejemplo, para crear o actualizar usuarios).  
+    - **schema.py:** Implementa los tipos GraphQL (DjangoObjectType) y las mutaciones (por ejemplo, para crear o actualizar usuarios). Aca se implementa el corazon de la API con graphQL.  
     - **templates/User/:**  
       - **formulario.html:** Interfaz de usuario (HTML) que se conecta a la API.  
       - **formulario.css:** Estilos (CSS) para el formulario.  
@@ -48,6 +51,136 @@ El archivo `core/User/schema.py` define los tipos y mutaciones de GraphQL. Por e
   - Se implementan mutaciones (por ejemplo, `CreateUser`, `UpdateUser`, etc.) que permiten crear, actualizar o eliminar registros.  
 - **Autenticación:**  
   - Se utiliza bcrypt para el hash de contraseñas y se manejan errores (por ejemplo, con `GraphQLError`) en caso de datos inválidos.  
+
+## Ejemplos de Peticiones GraphQL
+
+A continuación se muestran algunos ejemplos de peticiones que puedes realizar en el endpoint [http://35.192.42.29:8000/graphql/](http://35.192.42.29:8000/graphql/) (o en tu entorno local si lo ejecutas con runserver o Docker):
+
+### 1. Crear un Usuario (CreateUser)
+
+```graphql
+mutation {
+  createUser(input: {
+    username: "johndoe",
+    password: "secret",
+    email: "johndoe@example.com",
+    firstName: "John",
+    lastName: "Doe",
+    military: true,
+    temporal: false,
+    documentNumber: "123456",
+    documentType: 1,
+    placeOfExpedition: "Ciudad",
+    dateOfExpedition: "2023-01-01",
+    phone: "123456789",
+    cellPhone: "987654321",
+    address: "Calle 1",
+    city: "Ciudad",
+    country: 1,
+    emergencyName: "Jane Doe",
+    emergencyPhone: "555555555"
+  }) {
+    user {
+      id
+      username
+      email
+    }
+    ok
+    error
+  }
+}
+```
+
+### 2. Listar Usuarios (Query: allUsers)
+
+```graphql
+query {
+  allUsers {
+    id
+    username
+    email
+    firstName
+    lastName
+    military
+    temporal
+    documentNumber
+    documentType {
+      id
+      name
+    }
+    country {
+      id
+      name
+    }
+    contactInfo {
+      phone
+      cellPhone
+      address
+      city
+      emergencyName
+      emergencyPhone
+    }
+  }
+}
+```
+
+### 3. Listar Países (Query: allCountries)
+
+```graphql
+query {
+  allCountries {
+    id
+    name
+  }
+}
+```
+
+### 4. Listar Tipos de Documentos (Query: allTypeDocuments)
+
+```graphql
+query {
+  allTypeDocuments {
+    id
+    name
+  }
+}
+```
+
+### 5. Actualizar un Usuario (UpdateUser)
+
+```graphql
+mutation {
+  updateUser(input: {
+    id: 1,
+    email: "johndoe_updated@example.com",
+    firstName: "Johnny",
+    lastName: "Doe Updated"
+  }) {
+    user {
+      id
+      username
+      email
+      firstName
+      lastName
+    }
+    ok
+    error
+  }
+}
+```
+
+### 6. Eliminar un Usuario (DeleteUser)
+
+```graphql
+mutation {
+  deleteUser(input: { id: 1 }) {
+    ok
+    error
+  }
+}
+```
+
+---
 
 ## Ejecución del Proyecto
 
@@ -86,8 +219,10 @@ El archivo `core/User/schema.py` define los tipos y mutaciones de GraphQL. Por e
 
 - **Base de Datos:**  
   - Por defecto se usa SQLite. Si se requiere cambiar a PostgreSQL (u otra DB), actualiza `settings.py` y el `Dockerfile` (por ejemplo, instalando `psycopg2`).  
-  
+
 
 ---
+
+¡Gracias por revisar el proyecto! Si tienes dudas o sugerencias, no dudes en abrir un issue o contactar al equipo.
 
  
