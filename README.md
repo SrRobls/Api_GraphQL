@@ -52,135 +52,176 @@ El archivo `core/User/schema.py` define los tipos y mutaciones de GraphQL. Por e
 - **Autenticación:**  
   - Se utiliza bcrypt para el hash de contraseñas y se manejan errores (por ejemplo, con `GraphQLError`) en caso de datos inválidos.  
 
-## Ejemplos de Peticiones GraphQL
+## 🟢 Ejemplos de Peticiones GraphQL
 
-A continuación se muestran algunos ejemplos de peticiones que puedes realizar en el endpoint [http://35.192.42.29:8000/graphql/](http://35.192.42.29:8000/graphql/) (o en tu entorno local si lo ejecutas con runserver o Docker):
+Puedes probar estos ejemplos directamente en [http://35.192.42.29:8000/graphql/](http://35.192.42.29:8000/graphql/).
 
-### 1. Crear un Usuario (CreateUser)
+> **Nota:**  
+> Si deseas agregar más opciones de tipo de documento o país, debes hacerlo desde el panel de administración (admin) de Django, accesible en http://35.192.42.29:8000/admin/. La contraseña y el usuario es admin  
+> En el admin, agrega los nuevos registros en la sección "Type Document_TB" (para tipos de documento) y "Country_TB" (para países).
+
+---
+
+### 1. Crear un Usuario
 
 ```graphql
 mutation {
   createUser(input: {
-    username: "johndoe",
-    password: "secret",
-    email: "johndoe@example.com",
-    firstName: "John",
-    lastName: "Doe",
-    military: true,
-    temporal: false,
-    documentNumber: "123456",
-    documentType: 1,
-    placeOfExpedition: "Ciudad",
-    dateOfExpedition: "2023-01-01",
-    phone: "123456789",
-    cellPhone: "987654321",
-    address: "Calle 1",
-    city: "Ciudad",
-    country: 1,
-    emergencyName: "Jane Doe",
-    emergencyPhone: "555555555"
+    username: "Gabi01",
+    password: "claveSegura456",
+    email: "gabi@example.com",
+    name: "Carlos",
+    lastname: "Pérez",
+    isMilitar: false,
+    isTemporal: true,
+    document: {
+      document: "58518415554465415",
+      nameTypeDocument: "Cedula de Ciudadania",
+      placeExpedition: "Bogotá",
+      dateExpedition: "2022-06-10"
+    },
+    contact: {
+      phone: "6015551234",
+      celPhone: "3001235567",
+      address: "Cra 45 #67-89",
+      city: "Bogotá",
+      countryName: "Colombia",
+      emergencyName: "Laura Pérez",
+      emergencyPhone: "3105559876"
+    }
   }) {
-    user {
-      id
-      username
-      email
+    success
+    message
+    user{
+      userId
     }
-    ok
-    error
-  }
-}
-```
-
-### 2. Listar Usuarios (Query: allUsers)
-
-```graphql
-query {
-  allUsers {
-    id
-    username
-    email
-    firstName
-    lastName
-    military
-    temporal
-    documentNumber
-    documentType {
-      id
-      name
-    }
-    country {
-      id
-      name
-    }
-    contactInfo {
-      phone
-      cellPhone
-      address
-      city
-      emergencyName
-      emergencyPhone
-    }
-  }
-}
-```
-
-### 3. Listar Países (Query: allCountries)
-
-```graphql
-query {
-  allCountries {
-    id
-    name
-  }
-}
-```
-
-### 4. Listar Tipos de Documentos (Query: allTypeDocuments)
-
-```graphql
-query {
-  allTypeDocuments {
-    id
-    name
-  }
-}
-```
-
-### 5. Actualizar un Usuario (UpdateUser)
-
-```graphql
-mutation {
-  updateUser(input: {
-    id: 1,
-    email: "johndoe_updated@example.com",
-    firstName: "Johnny",
-    lastName: "Doe Updated"
-  }) {
-    user {
-      id
-      username
-      email
-      firstName
-      lastName
-    }
-    ok
-    error
-  }
-}
-```
-
-### 6. Eliminar un Usuario (DeleteUser)
-
-```graphql
-mutation {
-  deleteUser(input: { id: 1 }) {
-    ok
-    error
   }
 }
 ```
 
 ---
+
+### 2. Actualizar un Usuario
+
+```graphql
+mutation {
+  updateUser(
+    id: 3,
+    user: {
+      name: "Carlos"
+      lastname: "Robles"
+      isMilitar: true
+      isTemporal: true
+    },
+    document: {
+      document: "48484844484844444444",
+      placeExpedition: "Arauca",
+      typeDocumentName: "Cedula de Ciudadania"
+    },
+    contact: {
+      address: "Nueva dirección 456",
+      emergencyPhone: "3120001111",
+      countryName: "Colombia"
+    }
+  ) {
+    success
+    message
+    user{
+      name
+      lastName
+    }
+  }
+}
+```
+
+---
+
+### 3. Eliminar un Usuario
+
+```graphql
+mutation {
+  deleteUser(id: 8) {
+    success
+    message
+  }
+}
+```
+
+---
+
+### 4. Listar Tipos de Documentos
+
+```graphql
+query {
+  allTypeDocuments {
+    id
+    nameTypeDocument
+  }
+}
+```
+
+---
+
+### 5. Listar Países
+
+```graphql
+query {
+  allCountries {
+    id
+    countryName
+    countryCode
+  }
+}
+```
+
+---
+
+### 6. Buscar Usuario por Email
+
+```graphql
+query {
+  userByEmail(email: "roo@example.com"){
+    name
+    lastName
+    verificationToken
+    password
+  }
+}
+```
+
+---
+
+> **Consejo:**
+> Si quieres listar todos los usuarios, revisa el nombre y estructura exacta del query en tu schema, pero normalmente sería algo como:
+> 
+> ```graphql
+  > query {
+  >   allUsers {
+  >     userId
+  >     username
+  >     name
+  >     lastname
+  >     email
+  >     isMilitar
+  >     isTemporal
+  >     document {
+  >       document
+  >       nameTypeDocument
+  >       placeExpedition
+  >       dateExpedition
+  >     }
+  >     contact {
+  >       phone
+  >       celPhone
+  >       address
+  >       city
+  >       countryName
+  >       emergencyName
+  >       emergencyPhone
+  >     }
+  >   }
+  > }
+> ```
 
 ## Ejecución del Proyecto
 
