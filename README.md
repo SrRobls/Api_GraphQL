@@ -84,13 +84,9 @@ El archivo `core/User/schema.py` define los tipos y mutaciones de GraphQL. Por e
 
 ## Notas Adicionales
 
-- **Archivos Estáticos:**  
-  - El proyecto utiliza `{% static %}` en las plantillas (por ejemplo, en `formulario.html`) para enlazar CSS y JS.  
-  - Asegúrate de que en `settings.py` se configure correctamente `STATIC_URL` y `STATIC_ROOT` (por ejemplo, para producción se puede usar nginx).  
 - **Base de Datos:**  
   - Por defecto se usa SQLite. Si se requiere cambiar a PostgreSQL (u otra DB), actualiza `settings.py` y el `Dockerfile` (por ejemplo, instalando `psycopg2`).  
-- **Seguridad:**  
-  - Se recomienda revisar la configuración de `DEBUG` (en producción debe ser `False`) y la gestión de secretos (por ejemplo, con variables de entorno).  
+  
 
 ---
 
