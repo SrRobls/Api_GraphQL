@@ -14,17 +14,14 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Copia los archivos de requerimientos
-COPY core/requirements.txt /app/requirements.txt
+# Copia TODO el proyecto (no solo core/)
+COPY . /app
 
 # Instala dependencias de Python
-RUN pip install --upgrade pip && pip install -r requirements.txt
-
-# Copia el resto del código
-COPY core /app
+RUN pip install --upgrade pip && pip install -r /app/core/requirements.txt
 
 # Expone el puerto
 EXPOSE 8000
 
-# Comando para recolectar estáticos y correr el servidor
+# Comando para iniciar
 CMD python manage.py collectstatic --noinput && python manage.py migrate && python manage.py runserver 0.0.0.0:8000
