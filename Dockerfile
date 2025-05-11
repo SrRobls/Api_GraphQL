@@ -1,27 +1,30 @@
-# Usa una imagen oficial de Python
+# Usa una imagen oficial de Python como base
 FROM python:3.11-slim
 
-# Variables de entorno para Python
+# Variables de entorno para evitar archivos .pyc y mejorar logs
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-# Crea el directorio de la app
+# Define el directorio de trabajo dentro del contenedor
 WORKDIR /app
 
-# Instala dependencias del sistema
+# Instala dependencias del sistema necesarias para compilar Python packages
 RUN apt-get update && apt-get install -y \
     build-essential \
     libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Copia TODO el proyecto (no solo core/)
+# Copia todo el proyecto a /app
 COPY . /app
 
 # Instala dependencias de Python
-RUN pip install --upgrade pip && pip install -r /app/core/requirements.txt
+RUN pip install --upgrade pip && pip install -r core/requirements.txt
 
-# Expone el puerto
+# Da permisos de ejecución al script de entrada
+RUN chmod +x /app/entrypoint.sh
+
+# Expone el puerto (opcional)
 EXPOSE 8000
 
-# Comando para iniciar
-CMD python manage.py collectstatic --noinput && python manage.py migrate && python manage.py runserver 0.0.0.0:$PORT
+# Comando para arrancar el servidor
+CMD ["/app/entrypoint.sh"]
