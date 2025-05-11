@@ -264,6 +264,5 @@ query {
 
 ---
 
-¡Gracias por revisar el proyecto! Si tienes dudas o sugerencias, no dudes en abrir un issue o contactar al equipo.
 
  
