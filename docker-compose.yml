@@ -1,0 +1,13 @@
+version: '3.9'
+
+services:
+  django:
+    build: .
+    container_name: django_app
+    volumes:
+      - ./core:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=1
+    depends_on: []

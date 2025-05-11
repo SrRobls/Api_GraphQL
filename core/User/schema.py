@@ -138,6 +138,10 @@ class Query(graphene.ObjectType):
     
     
 # Create the mutations
+def validate_max_length(field_value, max_len, field_name):
+    if len(field_value) > max_len:
+        raise GraphQLError(f"{field_name} must be at most {max_len} characters long.")
+
 # Create User Mutation
 class CreateUser(graphene.Mutation):
     class Arguments:
@@ -178,6 +182,25 @@ class CreateUser(graphene.Mutation):
                 # Validate that the emergency phone number contains only numeric characters
                 if not input.contact.emergency_phone.isdigit():
                     return CreateUser(success=False, message="Emergency phone number must contain only numeric characters")
+                
+                # Validate the maximum length of each field because django does not do it
+                validate_max_length(input.username, 50, "Username")
+                validate_max_length(input.password, 128, "Password")
+                validate_max_length(input.email, 100, "Email")
+                validate_max_length(input.name, 20, "Name")
+                validate_max_length(input.lastname, 20, "Last name")
+
+                validate_max_length(input.document.document, 20, "Document")
+                validate_max_length(input.document.name_type_document, 50, "Type of Document")
+                validate_max_length(input.document.place_expedition, 60, "Place of Expedition")
+
+                validate_max_length(input.contact.phone, 20, "Phone")
+                validate_max_length(input.contact.cel_phone, 20, "Cellphone")
+                validate_max_length(input.contact.address, 60, "Address")
+                validate_max_length(input.contact.city, 50, "City")
+                validate_max_length(input.contact.country_name, 100, "Country")
+                validate_max_length(input.contact.emergency_name, 100, "Emergency Contact Name")
+                validate_max_length(input.contact.emergency_phone, 20, "Emergency Phone")
                 
                 try:
                     type_doc = TypeDocument_TB.objects.get(name_type_document__iexact=input.document.name_type_document)
@@ -253,10 +276,13 @@ class UpdateUser(graphene.Mutation):
                     if user.email:
                         if UserApp_TB.objects.filter(email=user.email).exclude(pk=user_obj.pk).exists():
                             return UpdateUser(success=False, message="Email already in use")
+                        validate_max_length(user.email, 100, "Email")
                         user_obj.email = user.email
                     if user.name:
+                        validate_max_length(user.name, 20, "Name")
                         user_obj.name = user.name
                     if user.lastname:
+                        validate_max_length(user.lastname, 20, "Last name")
                         user_obj.last_name = user.lastname
                     if user.is_militar is not None:
                         user_obj.is_militar = user.is_militar
@@ -268,12 +294,15 @@ class UpdateUser(graphene.Mutation):
                     doc_obj = getattr(user_obj, "userdocument_tb", None)
                     if doc_obj:
                         if document.document:
+                            validate_max_length(document.document, 20, "Document")
                             doc_obj.document = document.document
                         if document.place_expedition:
+                            validate_max_length(document.place_expedition, 60, "Place of Expedition")
                             doc_obj.place_expedition = document.place_expedition
                         if document.date_expedition:
                             doc_obj.date_expedition = document.date_expedition
                         if document.type_document_name:
+                            validate_max_length(document.type_document_name, 50, "Type of Document")
                             try:
                                 type_doc = TypeDocument_TB.objects.get(name_type_document__iexact=document.type_document_name)
                                 doc_obj.type_document = type_doc
@@ -284,13 +313,26 @@ class UpdateUser(graphene.Mutation):
                 if contact:
                     contact_obj = getattr(user_obj, "contact", None)
                     if contact_obj:
-                        if contact.phone: contact_obj.phone = contact.phone
-                        if contact.cel_phone: contact_obj.cel_phone = contact.cel_phone
-                        if contact.address: contact_obj.address = contact.address
-                        if contact.city: contact_obj.city = contact.city
-                        if contact.emergency_name: contact_obj.emergency_name = contact.emergency_name
-                        if contact.emergency_phone: contact_obj.emergency_phone = contact.emergency_phone
+                        if contact.phone:
+                            validate_max_length(contact.phone, 20, "Phone")
+                            contact_obj.phone = contact.phone
+                        if contact.cel_phone:
+                            validate_max_length(contact.cel_phone, 20, "Cellphone")
+                            contact_obj.cel_phone = contact.cel_phone
+                        if contact.address:
+                            validate_max_length(contact.address, 60, "Address")
+                            contact_obj.address = contact.address
+                        if contact.city:
+                            validate_max_length(contact.city, 50, "City")
+                            contact_obj.city = contact.city
+                        if contact.emergency_name:
+                            validate_max_length(contact.emergency_name, 100, "Emergency Contact Name")
+                            contact_obj.emergency_name = contact.emergency_name
+                        if contact.emergency_phone:
+                            validate_max_length(contact.emergency_phone, 20, "Emergency Phone")
+                            contact_obj.emergency_phone = contact.emergency_phone
                         if contact.country_name:
+                            validate_max_length(contact.country_name, 100, "Country")
                             try:
                                 country = Country_TB.objects.get(country_name__iexact=contact.country_name)
                                 contact_obj.country_id = country
@@ -302,7 +344,6 @@ class UpdateUser(graphene.Mutation):
         except Exception as e:
             # Handle any exceptions that occur during the transaction
             return UpdateUser(success=False, message=f"An error occurred: {str(e)}")
-
 
 # Delete User Mutation
 class DeleteUser(graphene.Mutation):

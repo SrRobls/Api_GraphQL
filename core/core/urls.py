@@ -23,5 +23,5 @@ from User.views import formulario_usuario
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('graphql/', csrf_exempt(GraphQLView.as_view(graphiql=True))),
-    path('formulario/', formulario_usuario, name='formulario_usuario'),
+    path('', formulario_usuario, name='formulario_usuario'),
 ]
